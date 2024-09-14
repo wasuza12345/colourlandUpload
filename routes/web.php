@@ -12,7 +12,7 @@ use App\Http\Controllers\FarmerWorkController;
 use App\Http\Controllers\FlowerController;
 use App\Http\Controllers\LineLoginController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
-
+use App\Http\Middleware\RoleMiddleware;
 // Route สำหรับการ Logout
 
 
@@ -21,31 +21,36 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+
 ])->group(function () {
-    Route::get('/', [HomePage::class, 'index'])->name('pages-home');
-    Route::get('/data', [HomePage::class, 'status_payment_status']);
-    Route::post('/orders/{orderId}/{action}', [HomePage::class, 'updateOrderStatus']);
-    Route::post('/orders/update-payment-status', [HomePage::class, 'updatePaymentStatus']);
-    Route::get('/show_orderlist/{id_order}', [HomePage::class, 'show_list_order']);
-    Route::post('/assign_works', [HomePage::class, 'assignWorks']);
-    Route::get('/show_orderlist_model1/{id_order}', [HomePage::class, 'show_list_order1']);
-    //Products
-    Route::get('/productAdmin', [FlowerController::class, 'index'])->name('product-admin');
-    Route::post('/add_productAdmin', [FlowerController::class, 'store'])->name('flowers.store');
-    Route::get('/product/delete/{id}', [FlowerController::class, 'delete']);
-    //cancel all
-    Route::get('/show_order_cencel', [Homepage::class, 'show_cancel_order'])->name('cancel-page');
-    //dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/order', [DashboardController::class, 'order_page'])->name('dashboard');
-    Route::get('/dashboard/quantity', [DashboardController::class, 'quantity_page'])->name('dashboard');
-    Route::get('/dashboard/sendWork', [DashboardController::class, 'send_work_page'])->name('dashboard');
-    Route::get('/work_farmer', [FarmerWorkController::class, 'index'])->name('work-of-farmer');
-    Route::post('/update_work_farmer', [FarmerWorkController::class, 'update_work_farmer']);
+    Route::middleware([RoleMiddleware::class . ':admin'])->group(function () {
+        Route::get('/', [HomePage::class, 'index'])->name('pages-home');
+        Route::get('/data', [HomePage::class, 'status_payment_status']);
+        Route::post('/orders/{orderId}/{action}', [HomePage::class, 'updateOrderStatus']);
+        Route::post('/orders/update-payment-status', [HomePage::class, 'updatePaymentStatus']);
+        Route::get('/show_orderlist/{id_order}', [HomePage::class, 'show_list_order']);
+        Route::post('/assign_works', [HomePage::class, 'assignWorks']);
+        Route::get('/show_orderlist_model1/{id_order}', [HomePage::class, 'show_list_order1']);
+        //Products
+        Route::get('/productAdmin', [FlowerController::class, 'index'])->name('product-admin');
+        Route::post('/add_productAdmin', [FlowerController::class, 'store'])->name('flowers.store');
+        Route::get('/product/delete/{id}', [FlowerController::class, 'delete']);
+        //cancel all
+        Route::get('/show_order_cencel', [Homepage::class, 'show_cancel_order'])->name('cancel-page');
+        //dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/order', [DashboardController::class, 'order_page'])->name('dashboard');
+        Route::get('/dashboard/quantity', [DashboardController::class, 'quantity_page'])->name('dashboard');
+        Route::get('/dashboard/sendWork', [DashboardController::class, 'send_work_page'])->name('dashboard');
+        Route::get('/work_farmer', [FarmerWorkController::class, 'index'])->name('work-of-farmer');
+        Route::post('/update_work_farmer', [FarmerWorkController::class, 'update_work_farmer']);
+    });
 });
 // Route สำหรับการเริ่มต้นการล็อกอินผ่าน LINE
 Route::get('/line/login', [LineLoginController::class, 'redirectToLine']);
-
+Route::get('/not_service', function () {
+    return view('content.pages.not-already-service');
+});
 // Route สำหรับรับ callback หลังจากผู้ใช้ล็อกอินผ่าน LINE
 Route::get('/callback', [LineLoginController::class, 'handleCallback'])->name('line.callback');
 // Route::get('/logout', function () {
@@ -58,7 +63,6 @@ Route::get('/home', function () {
     if (!session('line_user_id')) {
         return redirect('/login');
     }
-
-
     return view('home');
 })->name('home');
+Route::fallback([MiscError::class, 'index'])->name('pages-misc-error');
