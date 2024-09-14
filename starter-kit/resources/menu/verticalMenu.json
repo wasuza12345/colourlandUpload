@@ -1,0 +1,34 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Orders",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "slug": "pages-home"
+    },
+    {
+      "url": "/productAdmin",
+      "name": "Products",
+      "icon": "menu-icon tf-icons ti ti-brand-producthunt",
+      "slug": "product-admin"
+    },
+    {
+      "url": "/show_order_cencel",
+      "name": "Cancle",
+      "icon": "menu-icon tf-icons ti ti-circle-x",
+      "slug": "cancel-page"
+    },
+    {
+      "url": "/dashboard",
+      "name": "Dashboard",
+      "icon": "menu-icon tf-icons ti ti-dashboard",
+      "slug": "dashboard"
+    },
+    {
+      "url": "/work_farmer",
+      "name": "FarmerWork",
+      "icon": "menu-icon tf-icons ti ti-shovel-pitchforks",
+      "slug": "work-of-farmer"
+    }
+  ]
+}
